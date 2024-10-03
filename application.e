@@ -37,6 +37,8 @@ feature {NONE} -- Initialization
 
             -- Draw the snowman parts
             draw_snowman(canvas)
+
+            initialize_game
         end
 
 feature -- Variables
@@ -44,10 +46,9 @@ feature -- Variables
     first_window: MAIN_WINDOW
     canvas: EV_DRAWING_AREA
 
-feature -- Initalize Game
 feature {NONE} -- Initialization
 
-    make
+    initialize_game
         local
             dictionary: PLAIN_TEXT_FILE
             words: HASH_TABLE [STRING, INTEGER]
@@ -88,7 +89,6 @@ feature {NONE} -- Initialization
 
             -- uses attached to check if the retrieved word is not void
             if attached random_word as non_void_word then
-
                 -- prints the random word if the word is not void
                 io.put_string ("Random word: " + non_void_word + "%N")
 
@@ -98,14 +98,12 @@ feature {NONE} -- Initialization
                 -- prints a new line and then a number of underscores equal to the length of the random word
                 io.put_string ("%N")
                 print_underscores (non_void_word.count)
-
             else
-
                 -- prints an error message if the word is void
                 io.put_string ("Error: No word found.%N")
-
             end
         end
+
 
     -- function to randomly generate a word
     feature
@@ -152,7 +150,8 @@ feature {NONE} -- Initialization
                 io.put_string ("%N")
             end
 
-	feature 
+	feature
+	backEnd
 		local
 			alphabet_list: ARRAYED_LIST [STRING_8]
 			i: INTEGER_32
@@ -211,10 +210,10 @@ feature {NONE} -- Initialization
 							letter_state.put_i_th ('c', alphabet_list.index_of (guess, 1))
 							-- make every instance of the letter visible
 							else
-								letter_state.put_i_th ('i', alphabet_list.index_of (guess, 1))s
-
-
-
+								letter_state.put_i_th ('i', alphabet_list.index_of (guess, 1))
+end
+end
+end
 
 
 
