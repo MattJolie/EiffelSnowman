@@ -152,7 +152,8 @@ feature {NONE} -- Initialization
                 io.put_string ("%N")
             end
 
-	feature 
+	feature
+		backend
 		local
 			alphabet_list: ARRAYED_LIST [STRING_8]
 			i: INTEGER_32
@@ -211,8 +212,10 @@ feature {NONE} -- Initialization
 							letter_state.put_i_th ('c', alphabet_list.index_of (guess, 1))
 							-- make every instance of the letter visible
 							else
-								letter_state.put_i_th ('i', alphabet_list.index_of (guess, 1))s
-
+								letter_state.put_i_th ('i', alphabet_list.index_of (guess, 1))
+							end
+						end
+					end
 
 
 
