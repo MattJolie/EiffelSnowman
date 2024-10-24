@@ -80,6 +80,10 @@ feature -- Initialize Game
 				io.put_string ("Length of random word: " + non_void_word.count.out + "%N")
 				io.put_string ("%N")
 
+					-- Prints the random word (for error checking)
+				io.put_string ("Random word: " + random_word + "%N")
+				io.put_string ("%N")
+
 					-- Reinitialize guessed_letters with the length of the random word
 				create guessed_letters.make_filled ('_', non_void_word.count)
 
@@ -127,6 +131,7 @@ feature -- Initialize Game
 			end
 			io.put_string ("%N")
 		end
+
 --Main loop
 	game_loop (word: STRING)
 		local
@@ -161,12 +166,12 @@ feature -- Initialize Game
 -- Prompt for user's guess
 				io.put_string ("Guess: ")
 				io.read_character
-				guess := io.lastchar
+				guess := io.lastchar.as_lower
 
 -- Skip newline character if it is encountered
 				if guess = '%N' then
 					io.read_character
-					guess := io.lastchar
+					guess := io.lastchar.as_lower
 				end
 
 				already_guessed := False -- Keep track of if guess already made
@@ -192,7 +197,7 @@ feature -- Initialize Game
 				if already_guessed then
 					io.put_string ("Already guessed! Try again.%N")
 				else -- Otherwise continue with game
-					if guess.is_alpha or else guess = '%'' then -- Apostrophe handling
+					if guess.is_alpha or else guess = '%'' or else guess = '-' then -- Apostrophe/hyphen handling
 
 -- Reset the correct_guess flag at the start of each loop
 						guess_was_correct := False
@@ -234,7 +239,7 @@ feature -- Initialize Game
 							io.put_string ("Game over! The word was: " + word + "%N")
 						end
 					else
-						io.put_string ("Invalid input. Please enter an alphabetic character or an apostrophe.%N")
+						io.put_string ("Invalid input. Please enter an alphabetic character or an apostrophe/hyphen.%N")
 					end
 				end
 			end
