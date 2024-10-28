@@ -78,7 +78,7 @@ feature -- Initialize Game
 			if attached random_word as non_void_word then
 
 					-- Error checking, need to remove before final game
-				--io.put_string ("Random word: " + non_void_word + "%N")
+				io.put_string ("Random word: " + non_void_word + "%N")
 
 				io.put_string ("Length of random word: " + non_void_word.count.out + "%N")
 				io.put_string ("%N")
@@ -131,46 +131,83 @@ feature -- Initialize Game
 			io.put_string ("%N")
 		end
 
-	--Main loop
-	game_loop (word: STRING)
-		local
-			guess: CHARACTER_8
-			index: INTEGER
-			all_guessed: BOOLEAN
-			guess_was_correct: BOOLEAN
-			wrong_guess: ARRAY [CHARACTER_8]
-			i: INTEGER
-			already_guessed: BOOLEAN
-		do
-			all_guessed := False
-			create wrong_guess.make (1, 6)
+	-- Main loop
+game_loop (word: STRING)
+	local
+		guess: CHARACTER_8
+		index: INTEGER
+		all_guessed: BOOLEAN
+		guess_was_correct: BOOLEAN
+		wrong_guess: ARRAY [CHARACTER_8]
+		used_guesses: ARRAY [CHARACTER_8]
+		i, j: INTEGER
+		temp: CHARACTER_8
+		already_guessed: BOOLEAN
+	do
+		all_guessed := False
+		create wrong_guess.make (1, 6) -- initial array for incorrect guesses
 
+		from
+		until
+			all_guessed or else incorrect_guesses = 6
+		loop
+			-- Print sorted incorrect guesses
+			io.put_string ("Incorrect guesses: ")
+
+			-- Create an array with just the incorrect guesses
+			create used_guesses.make (1, incorrect_guesses)
 			from
+				i := 1
 			until
-				all_guessed or else incorrect_guesses = 6
+				i > incorrect_guesses
 			loop
-					-- Print incorrect
-				io.put_string ("Incorrect guesses: ")
+				used_guesses.put (wrong_guess.item (i), i)
+				i := i + 1
+			end
+
+			-- Sort `used_guesses` with bubble sort
+			from
+				i := 1
+			until
+				i > used_guesses.count - 1
+			loop
 				from
-					i := 1
+					j := 1
 				until
-					i > incorrect_guesses
+					j > used_guesses.count - i
 				loop
-					io.put_character (wrong_guess.item (i))
-					io.put_character (' ')
-					i := i + 1
-				end -- end printing wrong guesses
-				io.put_new_line
+					if used_guesses.item (j) > used_guesses.item (j + 1) then
+						-- Swap elements
+						temp := used_guesses.item (j)
+						used_guesses.put (used_guesses.item (j + 1), j)
+						used_guesses.put (temp, j + 1)
+					end
+					j := j + 1
+				end
+				i := i + 1
+			end
+
+			-- Print each character in sorted `used_guesses`
+			from
+				i := 1
+			until
+				i > used_guesses.count
+			loop
+				io.put_character (used_guesses.item (i))
+				io.put_character (' ')
+				i := i + 1
+			end -- end printing sorted wrong guesses
+			io.put_new_line
 
 					-- Prompt for user's guess
 				io.put_string ("Guess: ")
 				io.read_character
-				guess := io.lastchar
+				guess := io.lastchar.as_lower
 
 					-- Skip newline character if it is encountered
 				if guess = '%N' then
 					io.read_character
-					guess := io.lastchar
+					guess := io.lastchar.as_lower
 				end
 
 				already_guessed := False -- Keep track of if guess already made
@@ -196,7 +233,7 @@ feature -- Initialize Game
 				if already_guessed then
 					io.put_string ("Already guessed! Try again.%N")
 				else -- Otherwise continue with game
-					if guess.is_alpha or else guess = '%'' then -- Apostrophe handling
+					if guess.is_alpha or else guess = '%'' or else guess = '-' then -- Apostrophe/hyphen handling
 
 							-- Reset the correct_guess flag at the start of each loop
 						guess_was_correct := False
