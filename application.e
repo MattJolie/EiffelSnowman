@@ -32,7 +32,7 @@ feature {NONE} -- Initialization
 			make
 		end
 
-feature -- Variables
+feature
 
 	first_window: MAIN_WINDOW
 	canvas: EV_DRAWING_AREA
@@ -77,11 +77,10 @@ feature -- Initialize Game
 				-- Ensure random_word is valid
 			if attached random_word as non_void_word then
 
-				io.put_string ("Length of random word: " + non_void_word.count.out + "%N")
-				io.put_string ("%N")
+					-- Error checking, need to remove before final game
+				--io.put_string ("Random word: " + non_void_word + "%N")
 
-					-- Prints the random word (for error checking)
-				io.put_string ("Random word: " + random_word + "%N")
+				io.put_string ("Length of random word: " + non_void_word.count.out + "%N")
 				io.put_string ("%N")
 
 					-- Reinitialize guessed_letters with the length of the random word
@@ -132,7 +131,7 @@ feature -- Initialize Game
 			io.put_string ("%N")
 		end
 
---Main loop
+	--Main loop
 	game_loop (word: STRING)
 		local
 			guess: CHARACTER_8
@@ -144,13 +143,13 @@ feature -- Initialize Game
 			already_guessed: BOOLEAN
 		do
 			all_guessed := False
-			create wrong_guess.make (1, 6) -- max 6 for 6 guesses
+			create wrong_guess.make (1, 6)
 
 			from
 			until
 				all_guessed or else incorrect_guesses = 6
 			loop
--- Print incorrect
+					-- Print incorrect
 				io.put_string ("Incorrect guesses: ")
 				from
 					i := 1
@@ -163,24 +162,24 @@ feature -- Initialize Game
 				end -- end printing wrong guesses
 				io.put_new_line
 
--- Prompt for user's guess
+					-- Prompt for user's guess
 				io.put_string ("Guess: ")
 				io.read_character
-				guess := io.lastchar.as_lower
+				guess := io.lastchar
 
--- Skip newline character if it is encountered
+					-- Skip newline character if it is encountered
 				if guess = '%N' then
 					io.read_character
-					guess := io.lastchar.as_lower
+					guess := io.lastchar
 				end
 
 				already_guessed := False -- Keep track of if guess already made
 
--- Check if correct and reguess
+					-- Check if correct and reguess
 				if guessed_letters.has (guess) then
 					already_guessed := True
 				else
--- Check wrong guesses
+						-- Check wrong guesses
 					from
 						i := 1
 					until
@@ -193,45 +192,44 @@ feature -- Initialize Game
 					end
 				end -- end checks
 
--- Guess made already
+					-- Guess made already
 				if already_guessed then
 					io.put_string ("Already guessed! Try again.%N")
 				else -- Otherwise continue with game
-					if guess.is_alpha or else guess = '%'' or else guess = '-' then -- Apostrophe/hyphen handling
+					if guess.is_alpha or else guess = '%'' then -- Apostrophe handling
 
--- Reset the correct_guess flag at the start of each loop
+							-- Reset the correct_guess flag at the start of each loop
 						guess_was_correct := False
 
--- Check if the guessed character is in the word
+							-- Check if the guessed character is in the word
 						from
 							index := 1
 						until
 							index > word.count
 						loop
 							if word.item (index) = guess then
--- Update guessed letters for correct guess
+									-- Update guessed letters for correct guess
 								guessed_letters.put (guess, index)
 								guess_was_correct := True
 							end
 							index := index + 1
 						end
 
--- If the guess was correct, update the word tracker and continue
+							-- If the guess was correct, update the word tracker and continue
 						if guess_was_correct then
 							io.put_string ("Correct guess!%N")
 						else
--- Handle incorrect guess by drawing part of the snowman
+								-- Handle incorrect guess by drawing part of the snowman
 							incorrect_guesses := incorrect_guesses + 1
 							wrong_guess.put (guess, incorrect_guesses) -- Store the incorrect guess in the array
-
 							io.put_string ("Incorrect guess! Drawing part of the snowman.%N")
 							handle_incorrect_guess
 						end
 
--- Print the updated word tracker with correctly guessed letters
+							-- Print the updated word tracker with correctly guessed letters
 						print_word_tracker
 
--- Check if the player has guessed all letters correctly
+							-- Check if the player has guessed all letters correctly
 						if guessed_letters.is_equal (word) then
 							io.put_string ("Congratulations! You guessed the word.%N")
 							all_guessed := True
@@ -239,13 +237,13 @@ feature -- Initialize Game
 							io.put_string ("Game over! The word was: " + word + "%N")
 						end
 					else
-						io.put_string ("Invalid input. Please enter an alphabetic character or an apostrophe/hyphen.%N")
+						io.put_string ("Invalid input. Please enter an alphabetic character or an apostrophe.%N")
 					end
 				end
 			end
 		end
 
--- Handle drawing the hangman based on incorrect guesses
+		-- Handle drawing the hangman based on incorrect guesses
 	handle_incorrect_guess
 		do
 			if incorrect_guesses = 1 then
@@ -262,10 +260,10 @@ feature -- Initialize Game
 				draw_hat (canvas, 415, 455, 120, 20)
 			elseif incorrect_guesses = 5 then
 				io.put_string ("Drawing right arm.%N")
-				draw_right (canvas, 550, 500, 500, 525)
+				draw_right (canvas, 600, 500, 550, 560)
 			elseif incorrect_guesses = 6 then
 				io.put_string ("Drawing left arm.%N")
-				draw_left (canvas, 450, 525, 400, 500)
+				draw_left (canvas, 400, 560, 350, 500)
 				io.put_string ("Game over!%N")
 			end
 		end
@@ -285,6 +283,11 @@ feature -- Drawing Functions
 	draw_top (board: EV_DRAWING_AREA; x, y, width, height: INTEGER)
 		do
 			board.draw_ellipse (x, y, width, height)
+            board.fill_ellipse(455, 485, 10, 10)
+            board.fill_ellipse(485, 485, 10, 10)
+            board.draw_segment(455, 505, 495, 505)
+            board.draw_segment(455, 505, 465, 510)
+            board.draw_segment(495, 505, 485, 510)
 		end
 
 	draw_hat (board: EV_DRAWING_AREA; x, y, width: INTEGER; height: INTEGER)
